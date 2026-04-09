@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>CPU-GPU 教育模擬平台</title>
+    <link rel="stylesheet" type="text/css" href="vendor/joint.css" />
+    <link rel="stylesheet" type="text/css" href="vendor/digitaljs.css" />
+    <link rel="stylesheet" href="style.css?v=99" />
+</head>
+<body>
+    <div id="app">
+        <aside id="explorer">
+            <div id="explorer-fixed">
+                <header>模擬控制器</header>
+                <section class="control-panel" style="padding:10px;">
+                    <div class="btn-group">
+                        <button id="btn-play">▶ Play</button>
+                        <button id="btn-reset">🔄 Reset</button>
+                    </div>
+                    <button id="btn-toggle-edit" style="width:100%; margin-bottom:5px; background:#444;">🔒 Edit Mode: OFF</button>
+                    <button id="btn-reset-view" style="width:100%; margin-top:5px; background:#444;">🎯 Reset View (Zoom/Pan)</button>
+                </section>
+            </div>
+
+            <div id="explorer-scrollable">
+                <header>專案清單</header>
+                <nav id="hardware-tree">
+                    <ul>
+                        <li class="active" data-mode="gates">Step: 0 邏輯閘 (Basic Gates)</li>
+                        <li data-mode="turing">Step: 1 半加器 (Half-Adder)</li>
+                        <li data-mode="cpu">Step: 2 全加器 (Full-Adder)</li>
+                        <li data-mode="gpu">Step: 3 1-bit 儲存 (D-Latch)</li>
+                        <li data-mode="dff">Step: 4 D 正反器 (D-Flip-Flop)</li>
+                        <li data-mode="reg4_manual">Step: 5 手動暫存器 (Manual Register)</li>
+                        <li data-mode="reg4">Step: 6 內建暫存器 (Primitive Register)</li>
+                        <li data-mode="add4">Step: 7 4 位元加法器 (4-bit Adder)</li>
+                        <li data-mode="mux2">Step: 8 多路復用器 (4-to-1 Mux)</li>
+                        <li data-mode="alu4">Step: 9 算術邏輯單元 (4-bit ALU)</li>
+                        <li data-mode="decoder">Step: 10 指令解碼器 (Instruction Decoder)</li>
+                        <li data-mode="pc4">Step: 11 程式計數器 (Program Counter)</li>
+                        <li data-mode="rom16">Step: 12 指令記憶體 (Instruction ROM)</li>
+                        <li data-mode="cpu_final">Step: 13 完整 CPU 集成 (Full CPU)</li>
+                    </ul>
+                </nav>
+
+                <header>指令組譯器 (Assembler)</header>
+                <section class="code-editor" style="padding:10px;">
+                    <textarea id="asm-input" style="width:100%; height:80px; background:#1e1e1e; color:#0f0; border:1px solid #333; font-family:monospace; padding:5px;" placeholder="LOAD 5&#10;ADD 3&#10;MASK 1"></textarea>
+                    <button id="btn-assemble" style="width:100%; margin-top:5px;">🚀 編譯並寫入 ROM</button>
+                </section>
+
+                <header>電路說明</header>
+                <section id="circuit-info" style="padding:15px; font-size:13px; line-height:1.6; color:#ccc; background:#2d2d2d; margin:10px; border-radius:4px; border-left:3px solid #007acc;">
+                    正在載入說明...
+                </section>
+
+                <header>組件跳轉</header>
+                <section id="component-jump">
+                    <div id="comp-list">
+                        <ul id="breadcrumb-nav"><li>ROOT</li></ul>
+                    </div>
+                </section>
+
+                <section class="monitor" style="padding:10px;">
+                    <table id="reg-table"><thead><tr><th>Reg</th><th>Hex</th></tr></thead><tbody></tbody></table>
+                </section>
+            </div>
+        </aside>
+
+        <main id="stage">
+            <div id="paper"></div>
+        </main>
+    </div>
+
+    <!-- 基礎依賴：DigitalJS 0.13.x 必須要有這些全域變數 -->
+    <script src="vendor/jquery.min.js"></script>
+    <script src="vendor/lodash.min.js"></script>
+    <script src="vendor/backbone-min.js"></script>
+    <script src="vendor/joint.min.js"></script>
+    <script src="vendor/elk.bundled.js"></script>
+    
+    <!-- 載入 DigitalJS Bundle -->
+    <script src="js/digitaljs.js"></script>
+
+    <script>
+        (function() {
+            // 規範化全域變數，確保 DigitalJS 內部能找到它們
+            window.joint = window.joint || window.Joint;
+            
+            const dj = window.digitaljs || window.DigitalJS;
+            if (dj) {
+                window.digitaljs = dj.Circuit ? dj : (dj.default || dj);
+                console.log("[DEBUG] Environment Ready. DigitalJS:", !!window.digitaljs, "JointJS:", !!window.joint);
+            }
+        })();
+    </script>
+
+    <script type="module" src="js/main.js?v=101"></script>
+</body>
+</html>

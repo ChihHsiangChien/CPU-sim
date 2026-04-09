@@ -1,0 +1,249 @@
+/* Base Styles */
+* {
+    box-sizing: border-box;
+}
+
+body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #f3f3f3; /* Application background */
+    color: #333;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#app {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* Explorer Sidebar */
+#explorer {
+    width: 320px;
+    background: #f8f9fa;
+    border-right: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+#explorer-fixed {
+    border-bottom: 1px solid #ddd;
+    background: #f8f9fa;
+}
+
+#explorer-scrollable {
+    flex: 1;
+    overflow-y: auto;
+}
+
+header {
+    background: #e9ecef;
+    color: #495057;
+    padding: 10px 15px;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #dee2e6;
+    user-select: none;
+}
+
+/* Hardware Tree Navigation */
+#hardware-tree ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#hardware-tree li {
+    padding: 10px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+    transition: all 0.2s;
+    color: #495057;
+}
+
+#hardware-tree li:hover {
+    background: #e9ecef;
+    color: #000;
+}
+
+#hardware-tree li.active {
+    background: #007acc;
+    color: #fff;
+    border-left: 3px solid #005a9e;
+    padding-left: 17px;
+}
+
+/* Stage & Paper Area (The Workspace) */
+#stage {
+    flex: 1;
+    position: relative;
+    overflow: auto; /* Allow scrolling if canvas is large */
+    background: #d1d4d7; /* Distinct "desk" background */
+    padding: 40px; /* Padding around the "paper" */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* The actual Canvas "Paper" */
+#paper {
+    background: #ffffff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid #bbb;
+    min-width: 800px;
+    min-height: 600px;
+    cursor: grab;
+}
+
+#paper:active {
+    cursor: grabbing;
+}
+
+/* Controls & Buttons */
+.control-panel {
+    border-bottom: 1px solid #ddd;
+    padding: 15px;
+}
+
+.btn-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+button {
+    background: #007acc;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    border-radius: 4px;
+    transition: background 0.2s, transform 0.1s;
+}
+
+button:hover {
+    background: #005a9e;
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+/* Code Editor */
+#asm-input {
+    width: 100%;
+    background: #fff;
+    color: #212529;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 13px;
+    padding: 8px;
+    outline: none;
+}
+
+#asm-input:focus {
+    border-color: #007acc;
+    box-shadow: 0 0 0 0.2rem rgba(0,122,204,0.25);
+}
+
+/* Circuit Info Box */
+#circuit-info {
+    margin: 15px;
+    padding: 15px;
+    background: #ffffff;
+    border-radius: 4px;
+    border-left: 4px solid #007acc;
+    font-size: 13px;
+    color: #495057;
+    line-height: 1.6;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+#circuit-info b {
+    color: #212529;
+    font-size: 14px;
+}
+
+/* Monitor Table */
+.monitor {
+    margin-top: auto;
+    border-top: 1px solid #dee2e6;
+    background: #fff;
+}
+
+#reg-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+#reg-table th {
+    background: #f8f9fa;
+    color: #6c757d;
+    padding: 10px;
+    border-bottom: 2px solid #dee2e6;
+    text-align: left;
+}
+
+#reg-table td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    color: #2c3e50;
+    font-family: monospace;
+}
+
+/* Breadcrumb Navigation */
+#breadcrumb-nav {
+    list-style: none;
+    padding: 15px;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 11px;
+}
+
+#breadcrumb-nav li {
+    background: #e9ecef;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #495057;
+}
+
+#breadcrumb-nav li:hover {
+    background: #dee2e6;
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #bbb;
+}
+
+/* JointJS Element Styles Overrides */
+.joint-paper {
+    background-color: #ffffff !important;
+}

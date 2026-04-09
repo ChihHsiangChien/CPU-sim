@@ -1,0 +1,88 @@
+/* DigitalJS Component Styles */
+
+.digitaljs-gate {
+    fill: #2c3e50;
+    stroke: #ecf0f1;
+    stroke-width: 2;
+}
+
+.digitaljs-led {
+    stroke-width: 1;
+}
+
+.digitaljs-led-on {
+    fill: #e74c3c;
+    box-shadow: 0 0 10px #e74c3c;
+}
+
+.digitaljs-led-off {
+    fill: #7f8c8d;
+}
+
+.digitaljs-wire {
+    stroke: #3498db;
+    stroke-width: 2;
+}
+
+.digitaljs-wire-high {
+    stroke: #2ecc71;
+    stroke-width: 3;
+}
+
+.digitaljs-wire-low {
+    stroke: #2c3e50;
+    stroke-width: 2;
+}
+
+.digitaljs-wire-error {
+    stroke: #e74c3c;
+}
+
+.digitaljs-input {
+    fill: #34495e;
+    stroke: #ecf0f1;
+}
+
+.digitaljs-input:hover {
+    fill: #5d6d7e;
+}
+
+.digitaljs-text {
+    fill: #ecf0f1;
+    font-size: 12px;
+    font-family: sans-serif;
+}
+
+/* Custom UI for Simulator */
+.digitaljs-panel {
+    background: #252526;
+    color: #ccc;
+    border: 1px solid #333;
+}
+
+/* JointJS Element Overrides for DigitalJS */
+.joint-element[data-type="digitaljs.Gate"] rect {
+    fill: #333;
+    stroke: #555;
+}
+
+.joint-element[data-type="digitaljs.Input"] rect {
+    fill: #007acc;
+    cursor: pointer;
+}
+
+.joint-element[data-type="digitaljs.Output"] rect {
+    fill: #444;
+}
+
+/* Tooltips & Popups */
+.digitaljs-tooltip {
+    position: absolute;
+    background: #333;
+    color: #fff;
+    padding: 5px;
+    border-radius: 3px;
+    font-size: 12px;
+    z-index: 1000;
+    pointer-events: none;
+}
