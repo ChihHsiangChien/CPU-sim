@@ -170,7 +170,7 @@ export const Generator = {
                 dff1: { type: 'Dff', bits: 1, attributes: { position: { x: 180, y: 110 } } },
                 dff2: { type: 'Dff', bits: 1, attributes: { position: { x: 180, y: 190 } } },
                 dff3: { type: 'Dff', bits: 1, attributes: { position: { x: 180, y: 270 } } },
-                out: { type: 'BusGroup', groups: [1, 1, 1, 1], attributes: { position: { x: 320, y: 150 } } },
+                out: { type: 'BusGroup', bits: 4, groups: [1, 1, 1, 1], attributes: { position: { x: 320, y: 150 } } },
                 disp: { type: 'NumDisplay', bits: 4, numbase: 'bin', attributes: { position: { x: 450, y: 150 } } }
             },
             connectors: [
