@@ -166,12 +166,12 @@ export const Generator = {
                 d2: { type: 'Button', label: 'D2', attributes: { position: { x: 50, y: 190 } } },
                 d3: { type: 'Button', label: 'D3', attributes: { position: { x: 50, y: 270 } } },
                 clk: { type: 'Clock', label: 'CLK', attributes: { position: { x: 50, y: 350 } } },
-                dff0: { type: 'Dff', bits: 1, attributes: { position: { x: 200, y: 30 } } },
-                dff1: { type: 'Dff', bits: 1, attributes: { position: { x: 200, y: 110 } } },
-                dff2: { type: 'Dff', bits: 1, attributes: { position: { x: 200, y: 190 } } },
-                dff3: { type: 'Dff', bits: 1, attributes: { position: { x: 200, y: 270 } } },
-                out: { type: 'BusGroup', groups: [1, 1, 1, 1], attributes: { position: { x: 350, y: 150 } } },
-                disp: { type: 'NumDisplay', bits: 4, attributes: { position: { x: 450, y: 150 } } }
+                dff0: { type: 'Dff', bits: 1, attributes: { position: { x: 180, y: 30 } } },
+                dff1: { type: 'Dff', bits: 1, attributes: { position: { x: 180, y: 110 } } },
+                dff2: { type: 'Dff', bits: 1, attributes: { position: { x: 180, y: 190 } } },
+                dff3: { type: 'Dff', bits: 1, attributes: { position: { x: 180, y: 270 } } },
+                out: { type: 'BusGroup', groups: [1, 1, 1, 1], attributes: { position: { x: 320, y: 150 } } },
+                disp: { type: 'NumDisplay', bits: 4, numbase: 'bin', attributes: { position: { x: 450, y: 150 } } }
             },
             connectors: [
                 { from: { id: 'd0', port: 'out' }, to: { id: 'dff0', port: 'in' } },
@@ -195,11 +195,11 @@ export const Generator = {
     step6: () => {
         return {
             devices: {
-                in: { type: 'NumEntry', bits: 4, attributes: { position: { x: 50, y: 50 } } },
+                in: { type: 'NumEntry', bits: 4, numbase: 'bin', attributes: { position: { x: 50, y: 50 } } },
                 en: { type: 'Button', label: 'LOAD', attributes: { position: { x: 50, y: 130 } } },
                 clk: { type: 'Clock', label: 'CLK', attributes: { position: { x: 50, y: 200 } } },
                 reg: { type: 'Dff', bits: 4, polarity: { clock: true, enable: true }, attributes: { position: { x: 200, y: 100 } } },
-                out: { type: 'NumDisplay', bits: 4, attributes: { position: { x: 350, y: 100 } } }
+                out: { type: 'NumDisplay', bits: 4, numbase: 'bin', attributes: { position: { x: 350, y: 100 } } }
             },
             connectors: [
                 { from: { id: 'in', port: 'out' }, to: { id: 'reg', port: 'in' } },
@@ -214,10 +214,10 @@ export const Generator = {
     step7: () => {
         return {
             devices: {
-                a: { type: 'NumEntry', bits: 4, label: 'A', attributes: { position: { x: 50, y: 50 } } },
-                b: { type: 'NumEntry', bits: 4, label: 'B', attributes: { position: { x: 50, y: 150 } } },
+                a: { type: 'NumEntry', bits: 4, numbase: 'bin', label: 'A', attributes: { position: { x: 50, y: 50 } } },
+                b: { type: 'NumEntry', bits: 4, numbase: 'bin', label: 'B', attributes: { position: { x: 50, y: 150 } } },
                 adder: { type: 'Addition', bits: { in1: 4, in2: 4, out: 4 }, attributes: { position: { x: 200, y: 100 } } },
-                out: { type: 'NumDisplay', bits: 4, label: 'Sum', attributes: { position: { x: 350, y: 100 } } }
+                out: { type: 'NumDisplay', bits: 4, numbase: 'bin', label: 'Sum', attributes: { position: { x: 350, y: 100 } } }
             },
             connectors: [
                 { from: { id: 'a', port: 'out' }, to: { id: 'adder', port: 'in1' } },
@@ -235,9 +235,9 @@ export const Generator = {
                 in1: { type: 'Constant', bits: 4, constant: '0010', attributes: { position: { x: 50, y: 80 } } },
                 in2: { type: 'Constant', bits: 4, constant: '0100', attributes: { position: { x: 50, y: 130 } } },
                 in3: { type: 'Constant', bits: 4, constant: '1000', attributes: { position: { x: 50, y: 180 } } },
-                sel: { type: 'NumEntry', bits: 2, label: 'SELECT', attributes: { position: { x: 50, y: 250 } } },
+                sel: { type: 'NumEntry', bits: 2, numbase: 'bin', label: 'SELECT', attributes: { position: { x: 50, y: 250 } } },
                 mux: { type: 'Mux', bits: { in: 4, sel: 2 }, attributes: { position: { x: 200, y: 100 } } },
-                out: { type: 'NumDisplay', bits: 4, attributes: { position: { x: 350, y: 100 } } }
+                out: { type: 'NumDisplay', bits: 4, numbase: 'bin', attributes: { position: { x: 350, y: 100 } } }
             },
             connectors: [
                 { from: { id: 'in0', port: 'out' }, to: { id: 'mux', port: 'in0' } },
@@ -254,13 +254,13 @@ export const Generator = {
     step9: () => {
         return {
             devices: {
-                a: { type: 'NumEntry', bits: 4, label: 'A', attributes: { position: { x: 50, y: 50 } } },
-                b: { type: 'NumEntry', bits: 4, label: 'B', attributes: { position: { x: 50, y: 150 } } },
+                a: { type: 'NumEntry', bits: 4, numbase: 'bin', label: 'A', attributes: { position: { x: 50, y: 50 } } },
+                b: { type: 'NumEntry', bits: 4, numbase: 'bin', label: 'B', attributes: { position: { x: 50, y: 150 } } },
                 sel: { type: 'Button', label: 'ADD/SUB', attributes: { position: { x: 50, y: 250 } } },
                 add: { type: 'Addition', bits: { in1: 4, in2: 4, out: 4 }, attributes: { position: { x: 200, y: 50 } } },
                 sub: { type: 'Subtraction', bits: { in1: 4, in2: 4, out: 4 }, attributes: { position: { x: 200, y: 150 } } },
                 mux: { type: 'Mux', bits: { in: 4, sel: 1 }, attributes: { position: { x: 350, y: 100 } } },
-                out: { type: 'NumDisplay', bits: 4, attributes: { position: { x: 500, y: 100 } } }
+                out: { type: 'NumDisplay', bits: 4, numbase: 'bin', attributes: { position: { x: 500, y: 100 } } }
             },
             connectors: [
                 { from: { id: 'a', port: 'out' }, to: { id: 'add', port: 'in1' } },
@@ -279,7 +279,7 @@ export const Generator = {
     step10: () => {
         return {
             devices: {
-                instr: { type: 'NumEntry', bits: 2, label: 'OPCODE', attributes: { position: { x: 50, y: 100 } } },
+                instr: { type: 'NumEntry', bits: 2, numbase: 'bin', label: 'OPCODE', attributes: { position: { x: 50, y: 100 } } },
                 split: { type: 'BusUngroup', groups: [1, 1], attributes: { position: { x: 150, y: 100 } } },
                 not0: { type: 'Not', bits: 1, attributes: { position: { x: 250, y: 50 } } },
                 not1: { type: 'Not', bits: 1, attributes: { position: { x: 250, y: 150 } } },
@@ -309,7 +309,7 @@ export const Generator = {
                 pc: { type: 'Dff', bits: 4, label: 'PC', polarity: { clock: true, arst: true }, attributes: { position: { x: 200, y: 150 } } },
                 inc: { type: 'Addition', bits: { in1: 4, in2: 4, out: 4 }, attributes: { position: { x: 350, y: 80 } } },
                 one: { type: 'Constant', bits: 4, constant: '0001', attributes: { position: { x: 300, y: 50 } } },
-                out: { type: 'NumDisplay', bits: 4, attributes: { position: { x: 200, y: 250 } } }
+                out: { type: 'NumDisplay', bits: 4, numbase: 'bin', attributes: { position: { x: 200, y: 250 } } }
             },
             connectors: [
                 { from: { id: 'clk', port: 'out' }, to: { id: 'pc', port: 'clk' } },
@@ -326,13 +326,13 @@ export const Generator = {
     step12: () => {
         return {
             devices: {
-                addr: { type: 'NumEntry', bits: 2, label: 'ADDR', attributes: { position: { x: 50, y: 100 } } },
+                addr: { type: 'NumEntry', bits: 2, numbase: 'bin', label: 'ADDR', attributes: { position: { x: 50, y: 100 } } },
                 w0: { type: 'Constant', bits: 4, constant: '0101', attributes: { position: { x: 200, y: 30 } } },
                 w1: { type: 'Constant', bits: 4, constant: '0011', attributes: { position: { x: 200, y: 80 } } },
                 w2: { type: 'Constant', bits: 4, constant: '0010', attributes: { position: { x: 200, y: 130 } } },
                 w3: { type: 'Constant', bits: 4, constant: '0000', attributes: { position: { x: 200, y: 180 } } },
                 mux: { type: 'Mux', bits: { in: 4, sel: 2 }, attributes: { position: { x: 350, y: 100 } } },
-                out: { type: 'NumDisplay', bits: 4, attributes: { position: { x: 500, y: 100 } } }
+                out: { type: 'NumDisplay', bits: 4, numbase: 'bin', attributes: { position: { x: 500, y: 100 } } }
             },
             connectors: [
                 { from: { id: 'addr', port: 'out' }, to: { id: 'mux', port: 'sel' } },
@@ -345,7 +345,6 @@ export const Generator = {
         };
     },
 
-
     step13: () => {
         return {
             devices: {
@@ -357,7 +356,7 @@ export const Generator = {
                 pc_inc: { type: 'Addition', bits: { in1: 4, in2: 4, out: 4 }, attributes: { position: { x: 250, y: 80 } } },
                 pc_const: { type: 'Constant', bits: 4, constant: '0001', attributes: { position: { x: 200, y: 50 } } },
                 pc_mux: { type: 'Mux', bits: { in: 4, sel: 1 }, attributes: { position: { x: 350, y: 150 } } },
-                disp_pc: { type: 'NumDisplay', bits: 4, label: 'PC_ADDR', attributes: { position: { x: 150, y: 250 } } },
+                disp_pc: { type: 'NumDisplay', bits: 4, numbase: 'bin', label: 'PC_ADDR', attributes: { position: { x: 150, y: 250 } } },
 
                 // --- ROM ---
                 w0: { type: 'Constant', bits: 6, constant: '000101', label: 'LOAD 5', attributes: { position: { x: 450, y: 50 } } },
@@ -386,10 +385,11 @@ export const Generator = {
                 acc: { type: 'Dff', bits: 4, label: 'ACC', polarity: { clock: true, enable: true }, attributes: { position: { x: 1220, y: 200 } } },
 
                 // --- DISPLAYS ---
-                disp_data: { type: 'NumDisplay', bits: 4, label: 'DATA_VAL', attributes: { position: { x: 720, y: 250 } } },
-                disp_alu: { type: 'NumDisplay', bits: 4, label: 'ALU_OUT', attributes: { position: { x: 1050, y: 350 } } },
-                disp_acc: { type: 'NumDisplay', bits: 4, label: 'ACC_OUT', attributes: { position: { x: 1320, y: 200 } } }
+                disp_data: { type: 'NumDisplay', bits: 4, numbase: 'bin', label: 'DATA_VAL', attributes: { position: { x: 720, y: 250 } } },
+                disp_alu: { type: 'NumDisplay', bits: 4, numbase: 'bin', label: 'ALU_OUT', attributes: { position: { x: 1050, y: 350 } } },
+                disp_acc: { type: 'NumDisplay', bits: 4, numbase: 'bin', label: 'ACC_OUT', attributes: { position: { x: 1320, y: 200 } } }
             },
+
             connectors: [
                 { from: { id: 'clk_source', port: 'out' }, to: { id: 'pc', port: 'clk' } },
                 { from: { id: 'clk_source', port: 'out' }, to: { id: 'acc', port: 'clk' } },
