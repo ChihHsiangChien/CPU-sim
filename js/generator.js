@@ -146,7 +146,7 @@ export const Generator = {
             devices: {
                 d: { type: 'Button', label: 'D', attributes: { position: { x: 50, y: 50 } } },
                 clk: { type: 'Clock', label: 'CLK', attributes: { position: { x: 50, y: 150 } } },
-                dff: { type: 'Dff', bits: 1, attributes: { position: { x: 150, y: 100 } } },
+                dff: { type: 'Dff', bits: 1, polarity: { clock: true, arst: false }, attributes: { position: { x: 150, y: 100 } } },
                 q: { type: 'Output', bits: 1, label: 'Q', attributes: { position: { x: 250, y: 100 } } }
             },
             connectors: [
@@ -166,11 +166,11 @@ export const Generator = {
                 d2: { type: 'Button', label: 'D2', attributes: { position: { x: 50, y: 190 } } },
                 d3: { type: 'Button', label: 'D3', attributes: { position: { x: 50, y: 270 } } },
                 clk: { type: 'Clock', label: 'CLK', attributes: { position: { x: 50, y: 350 } } },
-                dff0: { type: 'Dff', bits: 1, attributes: { position: { x: 180, y: 30 } } },
-                dff1: { type: 'Dff', bits: 1, attributes: { position: { x: 180, y: 110 } } },
-                dff2: { type: 'Dff', bits: 1, attributes: { position: { x: 180, y: 190 } } },
-                dff3: { type: 'Dff', bits: 1, attributes: { position: { x: 180, y: 270 } } },
-                out: { type: 'BusGroup', bits: 4, groups: [1, 1, 1, 1], attributes: { position: { x: 320, y: 150 } } },
+                dff0: { type: 'Dff', bits: 1, polarity: { clock: true, arst: false }, attributes: { position: { x: 180, y: 30 } } },
+                dff1: { type: 'Dff', bits: 1, polarity: { clock: true, arst: false }, attributes: { position: { x: 180, y: 110 } } },
+                dff2: { type: 'Dff', bits: 1, polarity: { clock: true, arst: false }, attributes: { position: { x: 180, y: 190 } } },
+                dff3: { type: 'Dff', bits: 1, polarity: { clock: true, arst: false }, attributes: { position: { x: 180, y: 270 } } },
+                out: { type: 'BusGroup', groups: [1, 1, 1, 1], attributes: { position: { x: 320, y: 150 } } },
                 disp: { type: 'NumDisplay', bits: 4, numbase: 'bin', attributes: { position: { x: 450, y: 150 } } }
             },
             connectors: [
