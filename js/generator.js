@@ -56,6 +56,289 @@ export const Generator = {
         };
     },
 
+    // Step 1: Half-Adder
+    step1: () => {
+        return {
+            devices: {
+                a: { type: 'Button', label: 'A', attributes: { position: { x: 50, y: 50 } } },
+                b: { type: 'Button', label: 'B', attributes: { position: { x: 50, y: 150 } } },
+                xor: { type: 'Xor', bits: 1, attributes: { position: { x: 150, y: 50 } } },
+                and: { type: 'And', bits: 1, attributes: { position: { x: 150, y: 150 } } },
+                sum: { type: 'Output', bits: 1, label: 'Sum', attributes: { position: { x: 250, y: 50 } } },
+                carry: { type: 'Output', bits: 1, label: 'Carry', attributes: { position: { x: 250, y: 150 } } }
+            },
+            connectors: [
+                { from: { id: 'a', port: 'out' }, to: { id: 'xor', port: 'in1' } },
+                { from: { id: 'b', port: 'out' }, to: { id: 'xor', port: 'in2' } },
+                { from: { id: 'a', port: 'out' }, to: { id: 'and', port: 'in1' } },
+                { from: { id: 'b', port: 'out' }, to: { id: 'and', port: 'in2' } },
+                { from: { id: 'xor', port: 'out' }, to: { id: 'sum', port: 'in' } },
+                { from: { id: 'and', port: 'out' }, to: { id: 'carry', port: 'in' } }
+            ]
+        };
+    },
+
+    // Step 2: Full-Adder
+    step2: () => {
+        return {
+            devices: {
+                a: { type: 'Button', label: 'A', attributes: { position: { x: 50, y: 50 } } },
+                b: { type: 'Button', label: 'B', attributes: { position: { x: 50, y: 130 } } },
+                cin: { type: 'Button', label: 'Cin', attributes: { position: { x: 50, y: 210 } } },
+                xor1: { type: 'Xor', bits: 1, attributes: { position: { x: 150, y: 70 } } },
+                xor2: { type: 'Xor', bits: 1, attributes: { position: { x: 250, y: 100 } } },
+                and1: { type: 'And', bits: 1, attributes: { position: { x: 150, y: 170 } } },
+                and2: { type: 'And', bits: 1, attributes: { position: { x: 250, y: 200 } } },
+                or: { type: 'Or', bits: 1, attributes: { position: { x: 350, y: 180 } } },
+                sum: { type: 'Output', bits: 1, label: 'Sum', attributes: { position: { x: 450, y: 100 } } },
+                cout: { type: 'Output', bits: 1, label: 'Cout', attributes: { position: { x: 450, y: 180 } } }
+            },
+            connectors: [
+                { from: { id: 'a', port: 'out' }, to: { id: 'xor1', port: 'in1' } },
+                { from: { id: 'b', port: 'out' }, to: { id: 'xor1', port: 'in2' } },
+                { from: { id: 'xor1', port: 'out' }, to: { id: 'xor2', port: 'in1' } },
+                { from: { id: 'cin', port: 'out' }, to: { id: 'xor2', port: 'in2' } },
+                { from: { id: 'xor2', port: 'out' }, to: { id: 'sum', port: 'in' } },
+                { from: { id: 'a', port: 'out' }, to: { id: 'and1', port: 'in1' } },
+                { from: { id: 'b', port: 'out' }, to: { id: 'and1', port: 'in2' } },
+                { from: { id: 'xor1', port: 'out' }, to: { id: 'and2', port: 'in1' } },
+                { from: { id: 'cin', port: 'out' }, to: { id: 'and2', port: 'in2' } },
+                { from: { id: 'and1', port: 'out' }, to: { id: 'or', port: 'in1' } },
+                { from: { id: 'and2', port: 'out' }, to: { id: 'or', port: 'in2' } },
+                { from: { id: 'or', port: 'out' }, to: { id: 'cout', port: 'in' } }
+            ]
+        };
+    },
+
+    // Step 3: D-Latch
+    step3: () => {
+        return {
+            devices: {
+                d: { type: 'Button', label: 'D (Data)', attributes: { position: { x: 50, y: 80 } } },
+                en: { type: 'Button', label: 'E (Enable)', attributes: { position: { x: 50, y: 180 } } },
+                not: { type: 'Not', bits: 1, attributes: { position: { x: 120, y: 50 } } },
+                and1: { type: 'And', bits: 1, attributes: { position: { x: 200, y: 70 } } },
+                and2: { type: 'And', bits: 1, attributes: { position: { x: 200, y: 160 } } },
+                nor1: { type: 'Nor', bits: 1, attributes: { position: { x: 300, y: 90 } } },
+                nor2: { type: 'Nor', bits: 1, attributes: { position: { x: 300, y: 180 } } },
+                q: { type: 'Output', bits: 1, label: 'Q', attributes: { position: { x: 400, y: 90 } } },
+                nq: { type: 'Output', bits: 1, label: '~Q', attributes: { position: { x: 400, y: 180 } } }
+            },
+            connectors: [
+                { from: { id: 'd', port: 'out' }, to: { id: 'not', port: 'in' } },
+                { from: { id: 'not', port: 'out' }, to: { id: 'and1', port: 'in1' } },
+                { from: { id: 'en', port: 'out' }, to: { id: 'and1', port: 'in2' } },
+                { from: { id: 'd', port: 'out' }, to: { id: 'and2', port: 'in1' } },
+                { from: { id: 'en', port: 'out' }, to: { id: 'and2', port: 'in2' } },
+                { from: { id: 'and1', port: 'out' }, to: { id: 'nor1', port: 'in1' } },
+                { from: { id: 'nor2', port: 'out' }, to: { id: 'nor1', port: 'in2' } },
+                { from: { id: 'and2', port: 'out' }, to: { id: 'nor2', port: 'in2' } },
+                { from: { id: 'nor1', port: 'out' }, to: { id: 'nor2', port: 'in1' } },
+                { from: { id: 'nor1', port: 'out' }, to: { id: 'q', port: 'in' } },
+                { from: { id: 'nor2', port: 'out' }, to: { id: 'nq', port: 'in' } }
+            ]
+        };
+    },
+
+    // Step 4: D-Flip-Flop
+    step4: () => {
+        return {
+            devices: {
+                d: { type: 'Button', label: 'D', attributes: { position: { x: 50, y: 50 } } },
+                clk: { type: 'Clock', label: 'CLK', attributes: { position: { x: 50, y: 150 } } },
+                dff: { type: 'Dff', bits: 1, attributes: { position: { x: 150, y: 100 } } },
+                q: { type: 'Output', bits: 1, label: 'Q', attributes: { position: { x: 250, y: 100 } } }
+            },
+            connectors: [
+                { from: { id: 'd', port: 'out' }, to: { id: 'dff', port: 'in' } },
+                { from: { id: 'clk', port: 'out' }, to: { id: 'dff', port: 'clk' } },
+                { from: { id: 'dff', port: 'out' }, to: { id: 'q', port: 'in' } }
+            ]
+        };
+    },
+
+    // Step 5: Manual 4-bit Register
+    step5: () => {
+        return {
+            devices: {
+                d0: { type: 'Button', label: 'D0', attributes: { position: { x: 50, y: 30 } } },
+                d1: { type: 'Button', label: 'D1', attributes: { position: { x: 50, y: 110 } } },
+                d2: { type: 'Button', label: 'D2', attributes: { position: { x: 50, y: 190 } } },
+                d3: { type: 'Button', label: 'D3', attributes: { position: { x: 50, y: 270 } } },
+                clk: { type: 'Clock', label: 'CLK', attributes: { position: { x: 50, y: 350 } } },
+                dff0: { type: 'Dff', bits: 1, attributes: { position: { x: 200, y: 30 } } },
+                dff1: { type: 'Dff', bits: 1, attributes: { position: { x: 200, y: 110 } } },
+                dff2: { type: 'Dff', bits: 1, attributes: { position: { x: 200, y: 190 } } },
+                dff3: { type: 'Dff', bits: 1, attributes: { position: { x: 200, y: 270 } } },
+                out: { type: 'BusGroup', groups: [1, 1, 1, 1], attributes: { position: { x: 350, y: 150 } } },
+                disp: { type: 'NumDisplay', bits: 4, attributes: { position: { x: 450, y: 150 } } }
+            },
+            connectors: [
+                { from: { id: 'd0', port: 'out' }, to: { id: 'dff0', port: 'in' } },
+                { from: { id: 'd1', port: 'out' }, to: { id: 'dff1', port: 'in' } },
+                { from: { id: 'd2', port: 'out' }, to: { id: 'dff2', port: 'in' } },
+                { from: { id: 'd3', port: 'out' }, to: { id: 'dff3', port: 'in' } },
+                { from: { id: 'clk', port: 'out' }, to: { id: 'dff0', port: 'clk' } },
+                { from: { id: 'clk', port: 'out' }, to: { id: 'dff1', port: 'clk' } },
+                { from: { id: 'clk', port: 'out' }, to: { id: 'dff2', port: 'clk' } },
+                { from: { id: 'clk', port: 'out' }, to: { id: 'dff3', port: 'clk' } },
+                { from: { id: 'dff0', port: 'out' }, to: { id: 'out', port: 'in0' } },
+                { from: { id: 'dff1', port: 'out' }, to: { id: 'out', port: 'in1' } },
+                { from: { id: 'dff2', port: 'out' }, to: { id: 'out', port: 'in2' } },
+                { from: { id: 'dff3', port: 'out' }, to: { id: 'out', port: 'in3' } },
+                { from: { id: 'out', port: 'out' }, to: { id: 'disp', port: 'in' } }
+            ]
+        };
+    },
+
+    // Step 6: Primitive 4-bit Register with Enable
+    step6: () => {
+        return {
+            devices: {
+                in: { type: 'NumEntry', bits: 4, attributes: { position: { x: 50, y: 50 } } },
+                en: { type: 'Button', label: 'LOAD', attributes: { position: { x: 50, y: 130 } } },
+                clk: { type: 'Clock', label: 'CLK', attributes: { position: { x: 50, y: 200 } } },
+                reg: { type: 'Dff', bits: 4, polarity: { clock: true, enable: true }, attributes: { position: { x: 200, y: 100 } } },
+                out: { type: 'NumDisplay', bits: 4, attributes: { position: { x: 350, y: 100 } } }
+            },
+            connectors: [
+                { from: { id: 'in', port: 'out' }, to: { id: 'reg', port: 'in' } },
+                { from: { id: 'en', port: 'out' }, to: { id: 'reg', port: 'en' } },
+                { from: { id: 'clk', port: 'out' }, to: { id: 'reg', port: 'clk' } },
+                { from: { id: 'reg', port: 'out' }, to: { id: 'out', port: 'in' } }
+            ]
+        };
+    },
+
+    // Step 7: 4-bit Adder
+    step7: () => {
+        return {
+            devices: {
+                a: { type: 'NumEntry', bits: 4, label: 'A', attributes: { position: { x: 50, y: 50 } } },
+                b: { type: 'NumEntry', bits: 4, label: 'B', attributes: { position: { x: 50, y: 150 } } },
+                adder: { type: 'Addition', bits: { in1: 4, in2: 4, out: 4 }, attributes: { position: { x: 200, y: 100 } } },
+                out: { type: 'NumDisplay', bits: 4, label: 'Sum', attributes: { position: { x: 350, y: 100 } } }
+            },
+            connectors: [
+                { from: { id: 'a', port: 'out' }, to: { id: 'adder', port: 'in1' } },
+                { from: { id: 'b', port: 'out' }, to: { id: 'adder', port: 'in2' } },
+                { from: { id: 'adder', port: 'out' }, to: { id: 'out', port: 'in' } }
+            ]
+        };
+    },
+
+    // Step 8: 4-to-1 Mux
+    step8: () => {
+        return {
+            devices: {
+                in0: { type: 'Constant', bits: 4, constant: '0001', attributes: { position: { x: 50, y: 30 } } },
+                in1: { type: 'Constant', bits: 4, constant: '0010', attributes: { position: { x: 50, y: 80 } } },
+                in2: { type: 'Constant', bits: 4, constant: '0100', attributes: { position: { x: 50, y: 130 } } },
+                in3: { type: 'Constant', bits: 4, constant: '1000', attributes: { position: { x: 50, y: 180 } } },
+                sel: { type: 'NumEntry', bits: 2, label: 'SELECT', attributes: { position: { x: 50, y: 250 } } },
+                mux: { type: 'Mux', bits: { in: 4, sel: 2 }, attributes: { position: { x: 200, y: 100 } } },
+                out: { type: 'NumDisplay', bits: 4, attributes: { position: { x: 350, y: 100 } } }
+            },
+            connectors: [
+                { from: { id: 'in0', port: 'out' }, to: { id: 'mux', port: 'in0' } },
+                { from: { id: 'in1', port: 'out' }, to: { id: 'mux', port: 'in1' } },
+                { from: { id: 'in2', port: 'out' }, to: { id: 'mux', port: 'in2' } },
+                { from: { id: 'in3', port: 'out' }, to: { id: 'mux', port: 'in3' } },
+                { from: { id: 'sel', port: 'out' }, to: { id: 'mux', port: 'sel' } },
+                { from: { id: 'mux', port: 'out' }, to: { id: 'out', port: 'in' } }
+            ]
+        };
+    },
+
+    // Step 9: 4-bit ALU (Add/Sub)
+    step9: () => {
+        return {
+            devices: {
+                a: { type: 'NumEntry', bits: 4, label: 'A', attributes: { position: { x: 50, y: 50 } } },
+                b: { type: 'NumEntry', bits: 4, label: 'B', attributes: { position: { x: 50, y: 150 } } },
+                sel: { type: 'Button', label: 'ADD/SUB', attributes: { position: { x: 50, y: 250 } } },
+                add: { type: 'Addition', bits: { in1: 4, in2: 4, out: 4 }, attributes: { position: { x: 200, y: 50 } } },
+                sub: { type: 'Subtraction', bits: { in1: 4, in2: 4, out: 4 }, attributes: { position: { x: 200, y: 150 } } },
+                mux: { type: 'Mux', bits: { in: 4, sel: 1 }, attributes: { position: { x: 350, y: 100 } } },
+                out: { type: 'NumDisplay', bits: 4, attributes: { position: { x: 500, y: 100 } } }
+            },
+            connectors: [
+                { from: { id: 'a', port: 'out' }, to: { id: 'add', port: 'in1' } },
+                { from: { id: 'b', port: 'out' }, to: { id: 'add', port: 'in2' } },
+                { from: { id: 'a', port: 'out' }, to: { id: 'sub', port: 'in1' } },
+                { from: { id: 'b', port: 'out' }, to: { id: 'sub', port: 'in2' } },
+                { from: { id: 'add', port: 'out' }, to: { id: 'mux', port: 'in0' } },
+                { from: { id: 'sub', port: 'out' }, to: { id: 'mux', port: 'in1' } },
+                { from: { id: 'sel', port: 'out' }, to: { id: 'mux', port: 'sel' } },
+                { from: { id: 'mux', port: 'out' }, to: { id: 'out', port: 'in' } }
+            ]
+        };
+    },
+
+    // Step 10: Instruction Decoder
+    step10: () => {
+        return {
+            devices: {
+                instr: { type: 'NumEntry', bits: 2, label: 'OPCODE', attributes: { position: { x: 50, y: 100 } } },
+                dec: { type: 'Decoder', bits: 2, attributes: { position: { x: 200, y: 100 } } },
+                out0: { type: 'Output', bits: 1, label: 'LOAD', attributes: { position: { x: 350, y: 30 } } },
+                out1: { type: 'Output', bits: 1, label: 'ADD', attributes: { position: { x: 350, y: 80 } } },
+                out2: { type: 'Output', bits: 1, label: 'SUB', attributes: { position: { x: 350, y: 130 } } },
+                out3: { type: 'Output', bits: 1, label: 'JMP', attributes: { position: { x: 350, y: 180 } } }
+            },
+            connectors: [
+                { from: { id: 'instr', port: 'out' }, to: { id: 'dec', port: 'in' } },
+                { from: { id: 'dec', port: 'out0' }, to: { id: 'out0', port: 'in' } },
+                { from: { id: 'dec', port: 'out1' }, to: { id: 'out1', port: 'in' } },
+                { from: { id: 'dec', port: 'out2' }, to: { id: 'out2', port: 'in' } },
+                { from: { id: 'dec', port: 'out3' }, to: { id: 'out3', port: 'in' } }
+            ]
+        };
+    },
+
+    // Step 11: Program Counter
+    step11: () => {
+        return {
+            devices: {
+                clk: { type: 'Clock', label: 'CLK', attributes: { position: { x: 50, y: 100 } } },
+                rst: { type: 'Button', label: 'RESET', attributes: { position: { x: 50, y: 200 } } },
+                pc: { type: 'Dff', bits: 4, label: 'PC', polarity: { clock: true, arst: true }, attributes: { position: { x: 200, y: 150 } } },
+                inc: { type: 'Addition', bits: { in1: 4, in2: 4, out: 4 }, attributes: { position: { x: 350, y: 80 } } },
+                one: { type: 'Constant', bits: 4, constant: '0001', attributes: { position: { x: 300, y: 50 } } },
+                out: { type: 'NumDisplay', bits: 4, attributes: { position: { x: 200, y: 250 } } }
+            },
+            connectors: [
+                { from: { id: 'clk', port: 'out' }, to: { id: 'pc', port: 'clk' } },
+                { from: { id: 'rst', port: 'out' }, to: { id: 'pc', port: 'arst' } },
+                { from: { id: 'pc', port: 'out' }, to: { id: 'inc', port: 'in1' } },
+                { from: { id: 'one', port: 'out' }, to: { id: 'inc', port: 'in2' } },
+                { from: { id: 'inc', port: 'out' }, to: { id: 'pc', port: 'in' } },
+                { from: { id: 'pc', port: 'out' }, to: { id: 'out', port: 'in' } }
+            ]
+        };
+    },
+
+    // Step 12: ROM
+    step12: () => {
+        return {
+            devices: {
+                addr: { type: 'NumEntry', bits: 2, label: 'ADDR', attributes: { position: { x: 50, y: 100 } } },
+                rom: { 
+                    type: 'ROM', 
+                    bits: 4, 
+                    addr_bits: 2, 
+                    data: ['0101', '0011', '0010', '0000'],
+                    attributes: { position: { x: 200, y: 100 } } 
+                },
+                out: { type: 'NumDisplay', bits: 4, attributes: { position: { x: 350, y: 100 } } }
+            },
+            connectors: [
+                { from: { id: 'addr', port: 'out' }, to: { id: 'rom', port: 'in' } },
+                { from: { id: 'rom', port: 'out' }, to: { id: 'out', port: 'in' } }
+            ]
+        };
+    },
+
     step13: () => {
         return {
             devices: {
