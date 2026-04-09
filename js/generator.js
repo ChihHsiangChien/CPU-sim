@@ -280,18 +280,22 @@ export const Generator = {
         return {
             devices: {
                 instr: { type: 'NumEntry', bits: 2, label: 'OPCODE', attributes: { position: { x: 50, y: 100 } } },
-                dec: { type: 'Decoder', bits: 2, attributes: { position: { x: 200, y: 100 } } },
-                out0: { type: 'Output', bits: 1, label: 'LOAD', attributes: { position: { x: 350, y: 30 } } },
-                out1: { type: 'Output', bits: 1, label: 'ADD', attributes: { position: { x: 350, y: 80 } } },
-                out2: { type: 'Output', bits: 1, label: 'SUB', attributes: { position: { x: 350, y: 130 } } },
-                out3: { type: 'Output', bits: 1, label: 'JMP', attributes: { position: { x: 350, y: 180 } } }
+                split: { type: 'BusUngroup', groups: [1, 1], attributes: { position: { x: 150, y: 100 } } },
+                not0: { type: 'Not', bits: 1, attributes: { position: { x: 250, y: 50 } } },
+                not1: { type: 'Not', bits: 1, attributes: { position: { x: 250, y: 150 } } },
+                is_00: { type: 'And', bits: 1, label: 'LOAD', attributes: { position: { x: 350, y: 20 } } },
+                is_01: { type: 'And', bits: 1, label: 'ADD', attributes: { position: { x: 350, y: 80 } } },
+                is_10: { type: 'And', bits: 1, label: 'SUB', attributes: { position: { x: 350, y: 140 } } },
+                is_11: { type: 'And', bits: 1, label: 'JMP', attributes: { position: { x: 350, y: 200 } } }
             },
             connectors: [
-                { from: { id: 'instr', port: 'out' }, to: { id: 'dec', port: 'in' } },
-                { from: { id: 'dec', port: 'out0' }, to: { id: 'out0', port: 'in' } },
-                { from: { id: 'dec', port: 'out1' }, to: { id: 'out1', port: 'in' } },
-                { from: { id: 'dec', port: 'out2' }, to: { id: 'out2', port: 'in' } },
-                { from: { id: 'dec', port: 'out3' }, to: { id: 'out3', port: 'in' } }
+                { from: { id: 'instr', port: 'out' }, to: { id: 'split', port: 'in' } },
+                { from: { id: 'split', port: 'out0' }, to: { id: 'not0', port: 'in' } },
+                { from: { id: 'split', port: 'out1' }, to: { id: 'not1', port: 'in' } },
+                { from: { id: 'not1', port: 'out' }, to: { id: 'is_00', port: 'in1' } }, { from: { id: 'not0', port: 'out' }, to: { id: 'is_00', port: 'in2' } },
+                { from: { id: 'not1', port: 'out' }, to: { id: 'is_01', port: 'in1' } }, { from: { id: 'split', port: 'out0' }, to: { id: 'is_01', port: 'in2' } },
+                { from: { id: 'split', port: 'out1' }, to: { id: 'is_10', port: 'in1' } }, { from: { id: 'not0', port: 'out' }, to: { id: 'is_10', port: 'in2' } },
+                { from: { id: 'split', port: 'out1' }, to: { id: 'is_11', port: 'in1' } }, { from: { id: 'split', port: 'out0' }, to: { id: 'is_11', port: 'in2' } }
             ]
         };
     },
@@ -323,21 +327,24 @@ export const Generator = {
         return {
             devices: {
                 addr: { type: 'NumEntry', bits: 2, label: 'ADDR', attributes: { position: { x: 50, y: 100 } } },
-                rom: { 
-                    type: 'ROM', 
-                    bits: 4, 
-                    addr_bits: 2, 
-                    data: ['0101', '0011', '0010', '0000'],
-                    attributes: { position: { x: 200, y: 100 } } 
-                },
-                out: { type: 'NumDisplay', bits: 4, attributes: { position: { x: 350, y: 100 } } }
+                w0: { type: 'Constant', bits: 4, constant: '0101', attributes: { position: { x: 200, y: 30 } } },
+                w1: { type: 'Constant', bits: 4, constant: '0011', attributes: { position: { x: 200, y: 80 } } },
+                w2: { type: 'Constant', bits: 4, constant: '0010', attributes: { position: { x: 200, y: 130 } } },
+                w3: { type: 'Constant', bits: 4, constant: '0000', attributes: { position: { x: 200, y: 180 } } },
+                mux: { type: 'Mux', bits: { in: 4, sel: 2 }, attributes: { position: { x: 350, y: 100 } } },
+                out: { type: 'NumDisplay', bits: 4, attributes: { position: { x: 500, y: 100 } } }
             },
             connectors: [
-                { from: { id: 'addr', port: 'out' }, to: { id: 'rom', port: 'in' } },
-                { from: { id: 'rom', port: 'out' }, to: { id: 'out', port: 'in' } }
+                { from: { id: 'addr', port: 'out' }, to: { id: 'mux', port: 'sel' } },
+                { from: { id: 'w0', port: 'out' }, to: { id: 'mux', port: 'in0' } },
+                { from: { id: 'w1', port: 'out' }, to: { id: 'mux', port: 'in1' } },
+                { from: { id: 'w2', port: 'out' }, to: { id: 'mux', port: 'in2' } },
+                { from: { id: 'w3', port: 'out' }, to: { id: 'mux', port: 'in3' } },
+                { from: { id: 'mux', port: 'out' }, to: { id: 'out', port: 'in' } }
             ]
         };
     },
+
 
     step13: () => {
         return {
