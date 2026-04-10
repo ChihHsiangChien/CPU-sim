@@ -1,5 +1,5 @@
-import { Generator } from './generator.js?v=101';
-import { CONFIG } from './config.js?v=101';
+import { Generator } from './generator.js?v=104';
+import { CONFIG } from './config.js?v=104';
 
 const DESCRIPTIONS = {
     'gates': '<b>Step: 0 邏輯閘</b><br>展示基礎單元：AND, OR, XOR, NOT。',
@@ -25,7 +25,9 @@ class App {
         this.currentMode = 'gates';
         this.isPlaying = false;
         this.isDraggable = false;
-        this.heartbeat = null; // 定時器
+        this.heartbeat = null;
+        this._userTranslate = { tx: 40, ty: 40 }; // 使用者最後手動設定的畫布位置
+        this._romHighlightInterval = null;
         this.init();
     }
 
@@ -90,8 +92,7 @@ class App {
 
         $('#btn-reset-view').on('click', () => {
             if (this.paper) {
-                this.paper.translate(0, 0);
-                this.paper.scale(1, 1);
+                this._centerCircuit();
             }
         });
 
@@ -125,6 +126,13 @@ class App {
 
     renderCircuit(mode) {
         this.stopSimulation();
+
+        // 清除 ROM highlight 定時器
+        if (this._romHighlightInterval) {
+            clearInterval(this._romHighlightInterval);
+            this._romHighlightInterval = null;
+        }
+
         const json = Generator.generate(mode);
         $('#paper').empty();
         $('#circuit-info').html(DESCRIPTIONS[mode] || '無說明。');
@@ -137,7 +145,17 @@ class App {
             this.paper = this.circuit.displayOn($('#paper'));
             this.paper.setInteractivity({ elementMove: this.isDraggable });
             
-            // ... (keeping pan/zoom events)
+            // ── 永久防護：敀絶所有 DigitalJS 內部的 paper.translate 呼叫 ──
+            // DigitalJS 的模擬 tick 、ELK layout 、NumEntry 輸入都會觸發 translate(0,0)
+            // 我們的拖曳/置中程式改用 origTranslate 直接呼叫，完全繞過此 wrapper
+            const origTranslate = this.paper.translate.bind(this.paper);
+            this.paper.translate = (tx, ty) => {
+                if (tx === undefined) return origTranslate(); // getter 呼叫
+                // 所有外部呼叫一律默默還原使用者位置
+                origTranslate(this._userTranslate.tx, this._userTranslate.ty);
+            };
+
+            // ── 拖曳平移畫布 ──
             let dragStartPosition = null;
             $('#paper').off('mousedown.pan').on('mousedown.pan', (evt) => {
                 if (this.isDraggable && evt.target.closest('.joint-cell')) return;
@@ -152,7 +170,10 @@ class App {
                 const dy = evt.clientY - dragStartPosition.y;
                 dragStartPosition = { x: evt.clientX, y: evt.clientY };
                 const currentOrigin = this.paper.translate();
-                this.paper.translate(currentOrigin.tx + dx, currentOrigin.ty + dy);
+                const newTx = currentOrigin.tx + dx;
+                const newTy = currentOrigin.ty + dy;
+                this._userTranslate = { tx: newTx, ty: newTy };
+                origTranslate(newTx, newTy);
             }).on('mouseup.pan mouseleave.pan', () => {
                 if (!dragStartPosition) return;
                 dragStartPosition = null;
@@ -168,14 +189,138 @@ class App {
                 this.paper.scale(newScale, newScale);
             });
 
-            // Auto-play for ALL modes
-            setTimeout(() => this.startSimulation(), 300);
+            // Auto-play + 置中（等 DigitalJS layout 穩定後再置中）
+            setTimeout(() => {
+                this.startSimulation();
+                this._centerCircuit();
+                // ROM 連線高亮：只對 step12 啟用
+                if (mode === 'rom16') {
+                    setTimeout(() => this._setupRomHighlight(), 200);
+                }
+            }, 400);
             
             this.updateMonitor();
         } catch (err) {
             console.error("RENDER_ERROR:", err);
             const jsonStr = JSON.stringify(json, null, 2);
             $('#paper').html(`<div style="padding:20px; color:red; background:#fff1f0;"><h3>渲染出錯: ${err.message}</h3><details><summary>JSON</summary><pre>${jsonStr}</pre></details></div>`);
+        }
+    }
+
+    /**
+     * 做 ROM 連線動態高亮：
+     * 監控 addr 裝置的輸出信號，根據當前選中的地址，
+     * 將對應的 ROM word 連線變為橙色加粗，其餘變灰變細。
+     * 協議方式：
+     *  - 每 150ms poll 一次 addr device 的 state.out
+     *  - 變化時才更新 JointJS link attrs
+     *  - 常數→mux 的連線信號不變，所以 DigitalJS 不會覆蓋我們設置的顏色
+     */
+    _setupRomHighlight() {
+        if (!this.paper || !this.circuit) return;
+        if (this._romHighlightInterval) clearInterval(this._romHighlightInterval);
+
+        const graph = this.paper.model;
+        if (!graph || typeof graph.getLinks !== 'function') return;
+
+        const COLOR_ACTIVE   = '#ff8c00'; // 橙色 — 被選中的 ROM word
+        const COLOR_INACTIVE = '#555';    // 深灰 — 未被選中
+        const WIDTH_ACTIVE   = 3;
+        const WIDTH_INACTIVE = 1.5;
+
+        let lastAddrVal = -1;
+
+        const applyHighlight = (addrVal) => {
+            const links = graph.getLinks();
+            links.forEach(link => {
+                const target = link.get('target');
+                if (!target || !target.port) return;
+                // 只關心連入 MUX 的 in0~in3 接磁
+                const m = target.port.match(/^in(\d+)$/);
+                if (!m) return;
+
+                const portNum = parseInt(m[1], 10);
+                const isActive = (portNum === addrVal);
+
+                try {
+                    // JointJS 2.x attr path
+                    link.attr({
+                        line: {
+                            stroke:      isActive ? COLOR_ACTIVE   : COLOR_INACTIVE,
+                            strokeWidth: isActive ? WIDTH_ACTIVE   : WIDTH_INACTIVE
+                        }
+                    });
+                } catch(e) {
+                    // 如果 JointJS 1.x 格式不同，改用 CSS class
+                    try { link.attr('.connection/stroke', isActive ? COLOR_ACTIVE : COLOR_INACTIVE); } catch(_) {}
+                }
+            });
+        };
+
+        this._romHighlightInterval = setInterval(() => {
+            if (!this.circuit) return;
+
+            const devs = typeof this.circuit.getDevices === 'function'
+                ? this.circuit.getDevices()
+                : [];
+            const addrDev = devs.find(d => d.id === 'addr');
+            if (!addrDev) return;
+
+            const state = addrDev.get('state');
+            const raw   = state && (state.out !== undefined ? state.out : null);
+            if (raw === null || raw === undefined) return;
+
+            // DigitalJS 信號字串：MSB first，可能含 'x'未知位
+            const addrStr = String(raw).replace(/x/gi, '0').padStart(2, '0');
+            const addrVal = parseInt(addrStr, 2);
+            if (isNaN(addrVal)) return;
+
+            if (addrVal !== lastAddrVal) {
+                lastAddrVal = addrVal;
+                applyHighlight(addrVal);
+            }
+        }, 150);
+
+        // 初始化：預設 addr=0 高亮第一條連線
+        applyHighlight(0);
+    }
+
+    /**
+     * 自動將電路內容置中於畫布可視區域，並加上 padding。
+     * 利用 JointJS 的 paper.getContentBBox() 計算元件的邊界框，
+     * 再計算偏移量使其置於畫布中央。
+     */
+    _centerCircuit() {
+        if (!this.paper) return;
+        try {
+            const PADDING = 60;
+            // 先重設 scale 和 translate，才能正確取得 bbox
+            const origTranslate = Object.getPrototypeOf(this.paper).translate.bind(this.paper);
+            origTranslate(0, 0);
+            this.paper.scale(1, 1);
+
+            const bbox = this.paper.getContentBBox();
+            if (!bbox || (bbox.width === 0 && bbox.height === 0)) {
+                // fallback: 直接用固定 padding 偏移
+                const tx = PADDING;
+                const ty = PADDING;
+                this._userTranslate = { tx, ty };
+                origTranslate(tx, ty);
+                return;
+            }
+
+            const paperEl = document.getElementById('paper');
+            const viewW = paperEl ? paperEl.clientWidth  : 900;
+            const viewH = paperEl ? paperEl.clientHeight : 600;
+
+            // 讓電路左上角對齊 PADDING
+            const tx = PADDING - bbox.x;
+            const ty = PADDING - bbox.y;
+
+            this._userTranslate = { tx, ty };
+            origTranslate(tx, ty);
+        } catch(e) {
+            console.warn('_centerCircuit failed:', e);
         }
     }
 

@@ -326,13 +326,13 @@ export const Generator = {
     step12: () => {
         return {
             devices: {
-                addr: { type: 'NumEntry', bits: 2, numbase: 'bin', label: 'ADDR', attributes: { position: { x: 50, y: 100 } } },
-                w0: { type: 'Constant', bits: 4, constant: '0101', attributes: { position: { x: 200, y: 30 } } },
-                w1: { type: 'Constant', bits: 4, constant: '0011', attributes: { position: { x: 200, y: 80 } } },
-                w2: { type: 'Constant', bits: 4, constant: '0010', attributes: { position: { x: 200, y: 130 } } },
-                w3: { type: 'Constant', bits: 4, constant: '0000', attributes: { position: { x: 200, y: 180 } } },
-                mux: { type: 'Mux', bits: { in: 4, sel: 2 }, attributes: { position: { x: 350, y: 100 } } },
-                out: { type: 'NumDisplay', bits: 4, numbase: 'bin', attributes: { position: { x: 500, y: 100 } } }
+                addr: { type: 'NumEntry', bits: 2, numbase: 'bin', label: 'ADDR (00~11)', attributes: { position: { x: 50, y: 100 } } },
+                w0: { type: 'Constant', bits: 4, constant: '0101', label: '[Addr 00]  LOAD 5', attributes: { position: { x: 200, y: 30 } } },
+                w1: { type: 'Constant', bits: 4, constant: '0011', label: '[Addr 01]  ADD  3', attributes: { position: { x: 200, y: 80 } } },
+                w2: { type: 'Constant', bits: 4, constant: '0010', label: '[Addr 10]  SUB  2', attributes: { position: { x: 200, y: 130 } } },
+                w3: { type: 'Constant', bits: 4, constant: '0000', label: '[Addr 11]  JMP  0', attributes: { position: { x: 200, y: 180 } } },
+                mux: { type: 'Mux', bits: { in: 4, sel: 2 }, attributes: { position: { x: 380, y: 100 } } },
+                out: { type: 'NumDisplay', bits: 4, numbase: 'bin', label: 'ROM OUT', attributes: { position: { x: 530, y: 100 } } }
             },
             connectors: [
                 { from: { id: 'addr', port: 'out' }, to: { id: 'mux', port: 'sel' } },
@@ -358,6 +358,9 @@ export const Generator = {
                 pc_mux: { type: 'Mux', bits: { in: 4, sel: 1 }, attributes: { position: { x: 350, y: 150 } } },
                 disp_pc: { type: 'NumDisplay', bits: 4, numbase: 'bin', label: 'PC_ADDR', attributes: { position: { x: 150, y: 250 } } },
 
+                // 截取 PC 低 2 bits 作為 ROM 的 sel (避免 4-bit→2-bit 寬度不符)
+                pc_lo: { type: 'BusUngroup', groups: [2, 2], attributes: { position: { x: 450, y: 160 } } },
+
                 // --- ROM ---
                 w0: { type: 'Constant', bits: 6, constant: '000101', label: 'LOAD 5', attributes: { position: { x: 450, y: 50 } } },
                 w1: { type: 'Constant', bits: 6, constant: '010011', label: 'ADD 3', attributes: { position: { x: 450, y: 110 } } },
@@ -377,12 +380,14 @@ export const Generator = {
                 is_jmp:  { type: 'And', bits: 1, label: 'JP',  attributes: { position: { x: 880, y: 160 } } },
 
                 // --- EXECUTE ---
-                acc_en: { type: 'Or', bits: 1, inputs: 3, attributes: { position: { x: 980, y: 50 } } },
+                // acc_en = is_load | is_add | is_sub (chained 2-input ORs, DigitalJS does not support inputs:3)
+                acc_en_or1: { type: 'Or', bits: 1, attributes: { position: { x: 980, y: 30 } } },
+                acc_en:     { type: 'Or', bits: 1, attributes: { position: { x: 980, y: 80 } } },
                 alu_add: { type: 'Addition', bits: { in1: 4, in2: 4, out: 4 }, attributes: { position: { x: 950, y: 220 } } },
                 alu_sub: { type: 'Subtraction', bits: { in1: 4, in2: 4, out: 4 }, attributes: { position: { x: 950, y: 300 } } },
                 alu_mux: { type: 'Mux', bits: { in: 4, sel: 1 }, attributes: { position: { x: 1050, y: 260 } } },
                 acc_mux: { type: 'Mux', bits: { in: 4, sel: 1 }, attributes: { position: { x: 1130, y: 200 } } },
-                acc: { type: 'Dff', bits: 4, label: 'ACC', polarity: { clock: true, enable: true }, attributes: { position: { x: 1220, y: 200 } } },
+                acc: { type: 'Dff', bits: 4, label: 'ACC', polarity: { clock: true, enable: true, arst: true }, attributes: { position: { x: 1220, y: 200 } } },
 
                 // --- DISPLAYS ---
                 disp_data: { type: 'NumDisplay', bits: 4, numbase: 'bin', label: 'DATA_VAL', attributes: { position: { x: 720, y: 250 } } },
@@ -391,48 +396,66 @@ export const Generator = {
             },
 
             connectors: [
-                { from: { id: 'clk_source', port: 'out' }, to: { id: 'pc', port: 'clk' } },
+                // --- CLK & RST ---
+                { from: { id: 'clk_source', port: 'out' }, to: { id: 'pc',  port: 'clk' } },
                 { from: { id: 'clk_source', port: 'out' }, to: { id: 'acc', port: 'clk' } },
-                { from: { id: 'rst', port: 'out' }, to: { id: 'pc', port: 'arst' } },
-                { from: { id: 'pc', port: 'out' }, to: { id: 'pc_inc', port: 'in1' } },
+                { from: { id: 'rst', port: 'out' }, to: { id: 'pc',  port: 'arst' } },
+                { from: { id: 'rst', port: 'out' }, to: { id: 'acc', port: 'arst' } },
+
+                // --- FETCH: PC → PC+1 or JMP target ---
+                { from: { id: 'pc',       port: 'out' }, to: { id: 'pc_inc', port: 'in1' } },
                 { from: { id: 'pc_const', port: 'out' }, to: { id: 'pc_inc', port: 'in2' } },
-                { from: { id: 'pc_inc', port: 'out' }, to: { id: 'pc_mux', port: 'in0' } },
-                { from: { id: 'split', port: 'out0' }, to: { id: 'pc_mux', port: 'in1' } },
-                { from: { id: 'is_jmp', port: 'out' }, to: { id: 'pc_mux', port: 'sel' } },
-                { from: { id: 'pc_mux', port: 'out' }, to: { id: 'pc', port: 'in' } },
-                { from: { id: 'pc', port: 'out' }, to: { id: 'disp_pc', port: 'in' } },
-                { from: { id: 'pc', port: 'out' }, to: { id: 'rom_mux', port: 'sel' } },
+                { from: { id: 'pc_inc',   port: 'out' }, to: { id: 'pc_mux', port: 'in0' } },
+                { from: { id: 'split',    port: 'out0' }, to: { id: 'pc_mux', port: 'in1' } },
+                { from: { id: 'is_jmp',   port: 'out' }, to: { id: 'pc_mux', port: 'sel' } },
+                { from: { id: 'pc_mux',   port: 'out' }, to: { id: 'pc',     port: 'in'  } },
+                { from: { id: 'pc',       port: 'out' }, to: { id: 'disp_pc', port: 'in' } },
+
+                // PC 低 2 bits → ROM sel (Fix: 4-bit PC → 2-bit rom_mux sel)
+                { from: { id: 'pc',    port: 'out'  }, to: { id: 'pc_lo',   port: 'in'  } },
+                { from: { id: 'pc_lo', port: 'out0' }, to: { id: 'rom_mux', port: 'sel' } },
+
+                // --- ROM ---
                 { from: { id: 'w0', port: 'out' }, to: { id: 'rom_mux', port: 'in0' } },
                 { from: { id: 'w1', port: 'out' }, to: { id: 'rom_mux', port: 'in1' } },
                 { from: { id: 'w2', port: 'out' }, to: { id: 'rom_mux', port: 'in2' } },
                 { from: { id: 'w3', port: 'out' }, to: { id: 'rom_mux', port: 'in3' } },
                 { from: { id: 'rom_mux', port: 'out' }, to: { id: 'disp_instr', port: 'in' } },
-                { from: { id: 'rom_mux', port: 'out' }, to: { id: 'split', port: 'in' } },
-                { from: { id: 'split', port: 'out1' }, to: { id: 'op_split', port: 'in' } },
-                { from: { id: 'split', port: 'out0' }, to: { id: 'disp_data', port: 'in' } },
+
+                // --- DECODE: split 6-bit → out0=data(4bit低位), out1=opcode(2bit高位) ---
+                { from: { id: 'rom_mux', port: 'out'  }, to: { id: 'split',    port: 'in' } },
+                { from: { id: 'split',   port: 'out1' }, to: { id: 'op_split', port: 'in' } },
+                { from: { id: 'split',   port: 'out0' }, to: { id: 'disp_data', port: 'in' } },
                 { from: { id: 'op_split', port: 'out0' }, to: { id: 'not0', port: 'in' } },
                 { from: { id: 'op_split', port: 'out1' }, to: { id: 'not1', port: 'in' } },
-                { from: { id: 'not1', port: 'out' }, to: { id: 'is_load', port: 'in1' } }, { from: { id: 'not0', port: 'out' }, to: { id: 'is_load', port: 'in2' } },
-                { from: { id: 'not1', port: 'out' }, to: { id: 'is_add', port: 'in1' } },  { from: { id: 'op_split', port: 'out0' }, to: { id: 'is_add', port: 'in2' } },
-                { from: { id: 'op_split', port: 'out1' }, to: { id: 'is_sub', port: 'in1' } }, { from: { id: 'not0', port: 'out' }, to: { id: 'is_sub', port: 'in2' } },
-                { from: { id: 'op_split', port: 'out1' }, to: { id: 'is_jmp', port: 'in1' } }, { from: { id: 'op_split', port: 'out0' }, to: { id: 'is_jmp', port: 'in2' } },
-                { from: { id: 'is_load', port: 'out' }, to: { id: 'acc_en', port: 'in1' } },
-                { from: { id: 'is_add', port: 'out' }, to: { id: 'acc_en', port: 'in2' } },
-                { from: { id: 'is_sub', port: 'out' }, to: { id: 'acc_en', port: 'in3' } },
-                { from: { id: 'acc_en', port: 'out' }, to: { id: 'acc', port: 'en' } },
-                { from: { id: 'is_sub', port: 'out' }, to: { id: 'alu_mux', port: 'sel' } },
-                { from: { id: 'is_load', port: 'out' }, to: { id: 'acc_mux', port: 'sel' } },
-                { from: { id: 'acc', port: 'out' }, to: { id: 'alu_add', port: 'in1' } },
-                { from: { id: 'split', port: 'out0' }, to: { id: 'alu_add', port: 'in2' } },
-                { from: { id: 'acc', port: 'out' }, to: { id: 'alu_sub', port: 'in1' } },
-                { from: { id: 'split', port: 'out0' }, to: { id: 'alu_sub', port: 'in2' } },
-                { from: { id: 'alu_add', port: 'out' }, to: { id: 'alu_mux', port: 'in0' } },
-                { from: { id: 'alu_sub', port: 'out' }, to: { id: 'alu_mux', port: 'in1' } },
-                { from: { id: 'alu_mux', port: 'out' }, to: { id: 'disp_alu', port: 'in' } },
-                { from: { id: 'alu_mux', port: 'out' }, to: { id: 'acc_mux', port: 'in0' } },
-                { from: { id: 'split', port: 'out0' }, to: { id: 'acc_mux', port: 'in1' } },
-                { from: { id: 'acc_mux', port: 'out' }, to: { id: 'acc', port: 'in' } },
-                { from: { id: 'acc', port: 'out' }, to: { id: 'disp_acc', port: 'in' } }
+                { from: { id: 'not1',     port: 'out'  }, to: { id: 'is_load', port: 'in1' } }, { from: { id: 'not0',     port: 'out'  }, to: { id: 'is_load', port: 'in2' } },
+                { from: { id: 'not1',     port: 'out'  }, to: { id: 'is_add',  port: 'in1' } }, { from: { id: 'op_split', port: 'out0' }, to: { id: 'is_add',  port: 'in2' } },
+                { from: { id: 'op_split', port: 'out1' }, to: { id: 'is_sub',  port: 'in1' } }, { from: { id: 'not0',     port: 'out'  }, to: { id: 'is_sub',  port: 'in2' } },
+                { from: { id: 'op_split', port: 'out1' }, to: { id: 'is_jmp',  port: 'in1' } }, { from: { id: 'op_split', port: 'out0' }, to: { id: 'is_jmp',  port: 'in2' } },
+
+                // acc_en = is_load | is_add | is_sub  (Fix: chained 2-input ORs)
+                { from: { id: 'is_load',    port: 'out' }, to: { id: 'acc_en_or1', port: 'in1' } },
+                { from: { id: 'is_add',     port: 'out' }, to: { id: 'acc_en_or1', port: 'in2' } },
+                { from: { id: 'acc_en_or1', port: 'out' }, to: { id: 'acc_en',     port: 'in1' } },
+                { from: { id: 'is_sub',     port: 'out' }, to: { id: 'acc_en',     port: 'in2' } },
+                { from: { id: 'acc_en',     port: 'out' }, to: { id: 'acc', port: 'en' } },
+
+                // --- ALU ---
+                { from: { id: 'acc',     port: 'out'  }, to: { id: 'alu_add', port: 'in1' } },
+                { from: { id: 'split',   port: 'out0' }, to: { id: 'alu_add', port: 'in2' } },
+                { from: { id: 'acc',     port: 'out'  }, to: { id: 'alu_sub', port: 'in1' } },
+                { from: { id: 'split',   port: 'out0' }, to: { id: 'alu_sub', port: 'in2' } },
+                { from: { id: 'alu_add', port: 'out'  }, to: { id: 'alu_mux', port: 'in0' } },
+                { from: { id: 'alu_sub', port: 'out'  }, to: { id: 'alu_mux', port: 'in1' } },
+                { from: { id: 'is_sub',  port: 'out'  }, to: { id: 'alu_mux', port: 'sel' } },
+                { from: { id: 'alu_mux', port: 'out'  }, to: { id: 'disp_alu', port: 'in' } },
+
+                // --- acc_mux: sel=is_load → in0=ALU result, in1=immediate data ---
+                { from: { id: 'alu_mux', port: 'out'  }, to: { id: 'acc_mux', port: 'in0' } },
+                { from: { id: 'split',   port: 'out0' }, to: { id: 'acc_mux', port: 'in1' } },
+                { from: { id: 'is_load', port: 'out'  }, to: { id: 'acc_mux', port: 'sel' } },
+                { from: { id: 'acc_mux', port: 'out'  }, to: { id: 'acc',     port: 'in'  } },
+                { from: { id: 'acc',     port: 'out'  }, to: { id: 'disp_acc', port: 'in' } }
             ]
         };
     }
