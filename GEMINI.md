@@ -49,6 +49,6 @@ This is a static web application. No complex build step or transpilation is requ
 - **Interactive Mode**: By default, elements are not draggable in the simulator. Use the "Edit Mode" toggle in the UI to enable interactivity for debugging or layout adjustments.
 
 ## TODOs / Future Work
-- [ ] Complete the "Assembler" functionality to allow users to write and compile custom machine code into the ROM.
+- [x] Complete the "Assembler" functionality to allow users to write and compile custom machine code into the ROM.
 - [ ] Add more comprehensive descriptions for the GPU components.
 - [ ] Implement automated validation for circuit correctness.

@@ -325,7 +325,55 @@ class App {
     }
 
     assembleCode() {
-        alert("編譯器功能開發中。");
+        const text = $('#asm-input').val();
+        const lines = text.split('\n').filter(l => l.trim() !== '');
+        
+        const ISA = {
+            'LOAD': '00',
+            'ADD':  '01',
+            'SUB':  '10',
+            'JMP':  '11',
+            'MASK': '10' // 支援舊稱
+        };
+
+        const instructions = [];
+        try {
+            for (let i = 0; i < 4; i++) {
+                if (i < lines.length) {
+                    const parts = lines[i].trim().split(/\s+/);
+                    const mnemonic = parts[0].toUpperCase();
+                    const operand = parseInt(parts[1] || '0', 10);
+                    
+                    if (ISA[mnemonic] === undefined) {
+                        throw new Error(`未知指令: ${mnemonic} (於第 ${i+1} 行)`);
+                    }
+                    
+                    const opBin = ISA[mnemonic];
+                    const dataBin = (operand & 0xF).toString(2).padStart(4, '0');
+                    
+                    instructions.push({
+                        op: opBin,
+                        data: dataBin,
+                        label: `${mnemonic} ${operand}`
+                    });
+                } else {
+                    // 填充空指令 (NOP = ADD 0)
+                    instructions.push({ op: '01', data: '0000', label: 'NOP' });
+                }
+            }
+            
+            Generator.setROM(instructions);
+            
+            if (this.currentMode === 'cpu_final') {
+                this.renderCircuit('cpu_final');
+                alert("編譯成功！ROM 已更新。");
+            } else {
+                alert("編譯成功！請切換到 Step 13 即可看到效果。");
+            }
+            
+        } catch (e) {
+            alert("編譯失敗: " + e.message);
+        }
     }
 
     updateMonitor() {

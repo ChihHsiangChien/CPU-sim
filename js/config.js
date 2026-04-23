@@ -12,7 +12,7 @@ export const CONFIG = {
     ISA: {
         LOAD: '00',
         ADD: '01',
-        MASK: '10',
+        SUB: '10',
         JMP: '11'
     }
 };

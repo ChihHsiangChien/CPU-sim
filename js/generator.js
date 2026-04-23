@@ -345,7 +345,24 @@ export const Generator = {
         };
     },
 
+    customROM: [
+        { op: '00', data: '0101', label: 'LOAD 5' },
+        { op: '01', data: '0011', label: 'ADD 3' },
+        { op: '10', data: '0010', label: 'SUB 2' },
+        { op: '11', data: '0000', label: 'JMP 0' }
+    ],
+
+    setROM: (instructions) => {
+        // instructions: array of {op: 'xx', data: 'xxxx', label: '...'}
+        for (let i = 0; i < 4; i++) {
+            if (instructions[i]) {
+                Generator.customROM[i] = instructions[i];
+            }
+        }
+    },
+
     step13: () => {
+        const rom = Generator.customROM;
         return {
             devices: {
                 clk_source: { type: 'Clock', label: 'CPU CLK', attributes: { position: { x: 20, y: 100 } } },
@@ -362,10 +379,10 @@ export const Generator = {
                 pc_lo: { type: 'BusUngroup', groups: [2, 2], attributes: { position: { x: 450, y: 160 } } },
 
                 // --- ROM ---
-                w0: { type: 'Constant', bits: 6, constant: '000101', label: 'LOAD 5', attributes: { position: { x: 450, y: 50 } } },
-                w1: { type: 'Constant', bits: 6, constant: '010011', label: 'ADD 3', attributes: { position: { x: 450, y: 110 } } },
-                w2: { type: 'Constant', bits: 6, constant: '100010', label: 'SUB 2', attributes: { position: { x: 450, y: 170 } } },
-                w3: { type: 'Constant', bits: 6, constant: '110000', label: 'JMP 0', attributes: { position: { x: 450, y: 230 } } },
+                w0: { type: 'Constant', bits: 6, constant: rom[0].op + rom[0].data, label: rom[0].label, attributes: { position: { x: 450, y: 50 } } },
+                w1: { type: 'Constant', bits: 6, constant: rom[1].op + rom[1].data, label: rom[1].label, attributes: { position: { x: 450, y: 110 } } },
+                w2: { type: 'Constant', bits: 6, constant: rom[2].op + rom[2].data, label: rom[2].label, attributes: { position: { x: 450, y: 170 } } },
+                w3: { type: 'Constant', bits: 6, constant: rom[3].op + rom[3].data, label: rom[3].label, attributes: { position: { x: 450, y: 230 } } },
                 rom_mux: { type: 'Mux', bits: { in: 6, sel: 2 }, attributes: { position: { x: 580, y: 120 } } },
                 disp_instr: { type: 'NumDisplay', bits: 6, numbase: 'bin', label: 'INSTR', attributes: { position: { x: 580, y: 40 } } },
 
@@ -459,4 +476,5 @@ export const Generator = {
             ]
         };
     }
+
 };

@@ -2,6 +2,8 @@
 
 這是一個互動式的網頁版教育工具，旨在透過視覺化模擬，幫助學生與開發者深入理解計算機架構。本專案從最基礎的邏輯閘開始，逐步引導使用者構建出一個完整的 4 位元中央處理器 (CPU)。
 
+線上網頁：[https://chihhsiangchien.github.io/CPU-sim/](https://chihhsiangchien.github.io/CPU-sim/)
+
 ## 🚀 專案特點
 - **漸進式學習**：包含 14 個學習步驟（Step 0 到 Step 13）。
 - **即時電路模擬**：基於 [DigitalJS](https://github.com/tilk/digitaljs) 引擎，可觀察每一條線路的電位變化。
@@ -31,6 +33,3 @@
 本專案為純靜態網頁，不需安裝相依套件。
 1. 使用任何靜態網頁伺服器（如 `live-server`, `python -m http.server`, `npx serve .`）開啟目錄。
 2. 在瀏覽器中開啟 `index.html`。
-
----
-*註：本專案曾從瀏覽器快取中救回，並由 Gemini CLI 協助重建樣式與修復電路邏輯。*
